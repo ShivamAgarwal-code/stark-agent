@@ -6,7 +6,7 @@ import { Landmark, Plus, SquareMinus } from 'lucide-react'
 
 const tokens = ['ETH', 'USDT', 'BTC', 'DAI', 'LINK']
 
-const StakeNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
+const StakeNode: React.FC<NodeProps> = ({ isConnectable }) => {
     const [tokenInputs, setTokenInputs] = useState([
         { token: tokens[0], amount: '' }
     ])

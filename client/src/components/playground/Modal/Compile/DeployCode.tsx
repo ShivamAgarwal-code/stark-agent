@@ -1,11 +1,8 @@
 import React, { useState } from 'react'
 import { Button } from '../../../ui/button'
 import sample from './sample'
-export default function DeployCode({ setDisplayState }) {
+export default function DeployCode() {
     const [editable, setEditable] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [logs, setLogs] = useState<string[]>([]);
-    const [result, setResult] = useState<DeploymentResponse | null>(null);
     interface DeploymentResponse {
         success: boolean;
         contractAddress?: string;

@@ -4,7 +4,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input"
 import { HandCoins } from 'lucide-react'
 
-const AllocateNode = ({ data, isConnectable }) => {
+interface AllocateNodeProps {
+    data: {
+        label: string;
+    };
+    isConnectable: boolean;
+}
+
+const AllocateNode = ({ data, isConnectable }: AllocateNodeProps) => {
     const [allocationType, setAllocationType] = useState('')
     const [amount, setAmount] = useState('')
 

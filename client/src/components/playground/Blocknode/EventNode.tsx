@@ -1,12 +1,12 @@
 import React, { useState, useCallback } from 'react'
 import { Handle, Position, NodeProps } from 'reactflow'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Fan, ChevronLeft, ChevronRight, Equal, Pencil  } from 'lucide-react'
+import { Fan } from 'lucide-react'
 import { Input } from "@/components/ui/input"
 
 const currencies = ['ETH', 'USDT', 'BTC', 'DAI', 'LINK']
 
-const EventNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
+const EventNode: React.FC<NodeProps> = ({ isConnectable }) => {
     const [fromCurrency, setFromCurrency] = useState(currencies[0])
     const [toCurrency, setToCurrency] = useState(currencies[1])
     const [comparisonType, setComparisonType] = useState('')

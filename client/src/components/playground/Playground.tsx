@@ -2,11 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 // Third-party libraries
 import { motion } from "framer-motion"
-import {
-} from 'lucide-react'
 import ReactFlow, {
   Background,
-  BaseEdge,
   addEdge,
   getOutgoers,
   reconnectEdge,
@@ -38,13 +35,13 @@ const nodeTypes = {
 export default function Playground() {
   // State variables
   const [showFinishButton, setShowFinishButton] = useState(false)
-  const [isOpen, setIsOpen] = useState(true)
+  const [isOpen] = useState(true)
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
-  const [flowSummary, setFlowSummary] = useState([])
+  const [flowSummary, setFlowSummary] = useState<Array<{ id: string; content: string }>>([])
   const [showClearButton, setShowClearButton] = useState(false)
   const edgeReconnectSuccessful = useRef(true)
-  const [selectedNode, setSelectedNode] = useState(null)
+  const [selectedNode, setSelectedNode] = useState<string | null>(null)
 
 
 
@@ -58,27 +55,68 @@ export default function Playground() {
 
 
   // Function to handle node click (currently logs the node ID)
-  const handleNodeClick = useCallback((event, node) => {
+  const handleNodeClick = useCallback((event: React.MouseEvent, node: { id: string }) => {
     setSelectedNode(node.id)
   }, [])
 
 
   const { getNodes, getEdges } = useReactFlow();
 
+  // Function to update the flow summary based on the connected nodes
+  const updateFlowSummary = useCallback((sourceId: string, targetId: string) => {
+    const sourceNode = nodes.find((node) => node.id === sourceId)
+    const targetNode = nodes.find((node) => node.id === targetId)
+    
+    if (!sourceNode || !targetNode) return;
+
+    setFlowSummary((prevSummary) => {
+      const newItem = {
+        content: targetNode.data.content,
+        id: targetId,
+      }
+
+      // If the summary is empty, add the source node first
+      if (prevSummary.length === 0) {
+        return [
+          { content: sourceNode.data.content, id: sourceId },
+          newItem,
+        ]
+      }
+
+      // Check if the target node already exists in the summary
+      const existingIndex = prevSummary.findIndex(item => item.id === targetId)
+      if (existingIndex !== -1) {
+        // If it exists, remove it and all subsequent items
+        return [...prevSummary.slice(0, existingIndex), newItem]
+      } else {
+        // If it doesn't exist, add it to the end
+        return [...prevSummary, newItem]
+      }
+    })
+  }, [nodes, setFlowSummary])
+
   const isValidConnection = useCallback(
-    (connection) => {
+    (connection: { source: string | null; target: string | null }) => {
+      if (!connection.source || !connection.target) return false;
+      
       const nodes = getNodes();
       const edges = getEdges();
       const target = nodes.find((node) => node.id === connection.target);
-      const hasCycle = (node, visited = new Set()) => {
+      if (!target) return false;
+      
+      const hasCycle = (node: { id: string }, visited = new Set<string>()): boolean => {
         if (visited.has(node.id)) return false;
 
         visited.add(node.id);
 
-        for (const outgoer of getOutgoers(node, nodes, edges)) {
+        const fullNode = nodes.find(n => n.id === node.id);
+        if (!fullNode) return false;
+        const outgoers = getOutgoers(fullNode, nodes, edges);
+        for (const outgoer of outgoers) {
           if (outgoer.id === connection.source) return true;
           if (hasCycle(outgoer, visited)) return true;
         }
+        return false;
       };
 
       if (target.id === connection.source) return false;
@@ -88,32 +126,46 @@ export default function Playground() {
   );
 
   const onConnect = useCallback(
-    (params) => {
-      if (isValidConnection(params)) {
-        setEdges((els) => addEdge(params, els));
+    (params: { source: string | null; target: string | null; sourceHandle?: string | null; targetHandle?: string | null }) => {
+      if (!params.source || !params.target) return;
+      const connection = {
+        source: params.source,
+        target: params.target,
+        sourceHandle: params.sourceHandle || null,
+        targetHandle: params.targetHandle || null
+      };
+      if (isValidConnection(connection)) {
+        setEdges((els) => addEdge(connection, els));
         updateFlowSummary(params.source, params.target);
       } else {
         toast.error('Invalid connection: This would create a cycle');
       }
     },
-    [isValidConnection, updateFlowSummary]
+    [isValidConnection, updateFlowSummary, setEdges]
   );
 
   const onReconnectStart = useCallback(() => {
     edgeReconnectSuccessful.current = false;
   }, []);
 
-  const onReconnect = useCallback((oldEdge, newConnection) => {
+  const onReconnect = useCallback((oldEdge: { id: string; source: string; target: string }, newConnection: { source: string | null; target: string | null; sourceHandle?: string | null; targetHandle?: string | null }) => {
+    if (!newConnection.source || !newConnection.target) return;
+    const connection = {
+      source: newConnection.source,
+      target: newConnection.target,
+      sourceHandle: newConnection.sourceHandle || null,
+      targetHandle: newConnection.targetHandle || null
+    };
     edgeReconnectSuccessful.current = true;
-    setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
+    setEdges((els) => reconnectEdge(oldEdge, connection, els));
     updateFlowSummary(newConnection.source, newConnection.target);
-  }, [updateFlowSummary]);
+  }, [updateFlowSummary, setEdges]);
 
-  const onReconnectEnd = useCallback((_, edge) => {
+  const onReconnectEnd = useCallback((_: unknown, edge: { id: string; source: string; target: string }) => {
     if (!edgeReconnectSuccessful.current) {
       setEdges((eds) => eds.filter((e) => e.id !== edge.id));
       // Remove the connection from the flow summary
-      setFlowSummary((prevSummary) => {
+      setFlowSummary((prevSummary: Array<{ id: string; content: string }>) => {
         const sourceIndex = prevSummary.findIndex(item => item.id === edge.source);
         const targetIndex = prevSummary.findIndex(item => item.id === edge.target);
         if (sourceIndex !== -1 && targetIndex !== -1) {
@@ -124,23 +176,12 @@ export default function Playground() {
     }
 
     edgeReconnectSuccessful.current = true;
-  }, []);
+  }, [setEdges, setFlowSummary]);
 
-  // Custom edge styles
-  const edgeStyles = {
-    default: {
-      stroke: '#555',
-      strokeWidth: 2,
-      transition: 'stroke 0.3s, stroke-width 0.3s',
-    },
-    selected: {
-      stroke: '#FE007A',
-      strokeWidth: 3,
-    },
-  }
 
   // Edge update function
-  const edgeUpdateHandler = useCallback((oldEdge, newConnection) => {
+  const edgeUpdateHandler = useCallback((oldEdge: { id: string; source: string; target: string }, newConnection: { source: string | null; target: string | null; sourceHandle?: string | null; targetHandle?: string | null }) => {
+    if (!newConnection.source || !newConnection.target) return oldEdge;
     return { ...oldEdge, ...newConnection }
   }, [])
 
@@ -184,20 +225,6 @@ export default function Playground() {
             onEdgeUpdate={edgeUpdateHandler}
           >
             <Background />
-            {edges.map((edge) => (
-              <BaseEdge
-                key={edge.id}
-                id={edge.id}
-                source={edge.source}
-                target={edge.target}
-                style={
-                  selectedNode &&
-                    (edge.source === selectedNode || edge.target === selectedNode)
-                    ? edgeStyles.selected
-                    : edgeStyles.default
-                }
-              />
-            ))}
           </ReactFlow>
         </div>
       </motion.div>
@@ -205,42 +232,11 @@ export default function Playground() {
   );
 
   // Function to delete a node and its associated edges
-  function handleDeleteNode(nodeId) {
+  function handleDeleteNode(nodeId: string) {
     setNodes((nds) => nds.filter((node) => node.id !== nodeId))
     setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId))
     setFlowSummary((prevSummary) => prevSummary.filter((item) => item.id !== nodeId))
     toast.success('Block deleted')
-  }
-
-  // Function to update the flow summary based on the connected nodes
-  function updateFlowSummary(sourceId, targetId) {
-    const sourceNode = nodes.find((node) => node.id === sourceId)
-    const targetNode = nodes.find((node) => node.id === targetId)
-
-    setFlowSummary((prevSummary) => {
-      const newItem = {
-        content: targetNode.data.content,
-        id: targetId,
-      }
-
-      // If the summary is empty, add the source node first
-      if (prevSummary.length === 0) {
-        return [
-          { content: sourceNode.data.content, id: sourceId },
-          newItem,
-        ]
-      }
-
-      // Check if the target node already exists in the summary
-      const existingIndex = prevSummary.findIndex(item => item.id === targetId)
-      if (existingIndex !== -1) {
-        // If it exists, remove it and all subsequent items
-        return [...prevSummary.slice(0, existingIndex), newItem]
-      } else {
-        // If it doesn't exist, add it to the end
-        return [...prevSummary, newItem]
-      }
-    })
   }
 
   // Form submission handler for adding a custom block
@@ -255,7 +251,7 @@ export default function Playground() {
   }
 
   // Function to add a block to the canvas
-  function addBlock(block) {
+  function addBlock(block: { id: string; content: string }) {
     const newNodeId = Date.now().toString()
     const newNode = {
       id: newNodeId,
@@ -277,9 +273,11 @@ export default function Playground() {
   }
 
   // Function to add a new node connected to a source node
-  function handleAddNode(sourceNodeId, block) {
+  function handleAddNode(sourceNodeId: string, block: { id: string; content: string }) {
     const newNodeId = Date.now().toString()
     const sourceNode = nodes.find(node => node.id === sourceNodeId)
+    if (!sourceNode) return;
+    
     const newNode = {
       id: newNodeId,
       type: 'blockNode',

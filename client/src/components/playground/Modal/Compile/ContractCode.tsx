@@ -11,21 +11,17 @@ interface DeploymentResponse {
 }
 
 interface ContractCodeProps {
-  nodes: any; // Update with proper type if available
-  edges: any; // Update with proper type if available
-  flowSummary: any; // Update with proper type if available
+  nodes: unknown;
+  edges: unknown;
+  flowSummary: unknown;
   sourceCode: string;
   setSourceCode: (code: string) => void;
-  setDisplayState: (state: any) => void; // Update with proper type if available
+  setDisplayState: (state: unknown) => void;
 }
 
 const ContractCode: React.FC<ContractCodeProps> = ({
-  nodes,
-  edges,
-  flowSummary,
   sourceCode,
   setSourceCode,
-  setDisplayState,
 }) => {
   const [editable, setEditable] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -111,7 +107,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
           const { value, done: isDone } = await reader.read();
           done = isDone;
           if (value) {
-            setSourceCode((prev) => prev + decoder.decode(value));
+            setSourceCode((prev: string) => prev + decoder.decode(value));
           }
         }
       }

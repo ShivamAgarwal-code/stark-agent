@@ -1,21 +1,8 @@
-import React, { useState, useCallback } from 'react'
+import React from 'react'
 import { Handle, Position, NodeProps } from 'reactflow'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowRightLeft } from 'lucide-react'
 
-const currencies = ['ETH', 'USDT', 'BTC', 'DAI', 'LINK']
-
-const SwapNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
-    const [fromCurrency, setFromCurrency] = useState(currencies[0])
-    const [toCurrency, setToCurrency] = useState(currencies[1])
-
-    const onFromCurrencyChange = useCallback((value: string) => {
-        setFromCurrency(value)
-    }, [])
-
-    const onToCurrencyChange = useCallback((value: string) => {
-        setToCurrency(value)
-    }, [])
+const SwapNode: React.FC<NodeProps> = ({ isConnectable }) => {
 
     return (
         <div className="bg-[#142321] text-white p-4 rounded-lg shadow-md border-[1px] border-[#245C3D] hover:border-[#6AFB8E] transition-colors w-[250px]">

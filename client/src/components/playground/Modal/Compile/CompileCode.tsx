@@ -1,72 +1,9 @@
 import React, { useState } from "react";
 import { Button } from "../../../ui/button";
-import sample from "./sample";
-import axios from "axios";
-import DeploymentPage from "@/pages/deploy";
 
-interface DeploymentResponse {
-  success: boolean;
-  contractAddress?: string;
-  classHash?: string;
-  transactionHash?: string;
-  error?: string;
-  details?: string;
-}
-
-export default function ContractCode({
-  sourceCode,
-  setSourceCode,
-  setDisplayState,
-}) {
+export default function ContractCode() {
   const [editable, setEditable] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [logs, setLogs] = useState<string[]>([]);
-  const [result, setResult] = useState<DeploymentResponse | null>(null);
 
-  const addLog = (message: string) => {
-    setLogs((prev) => [
-      ...prev,
-      `${new Date().toISOString().split("T")[1].split(".")[0]} - ${message}`,
-    ]);
-  };
-
-  const handleDeploy = async () => {
-    setIsLoading(true);
-    setResult(null);
-    setLogs([]);
-    addLog("Starting deployment process...");
-
-    try {
-      addLog("Compiling and deploying contract...");
-      
-      const response = await fetch("/api/deploy-contract", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contractName: "contract_contract" }),
-      });
-      console.log("hit");
-
-      const data: DeploymentResponse = await response.json();
-      setResult(data);
-
-      if (data.success) {
-        addLog("✅ Deployment successful!");
-      } else {
-        addLog(`❌ Error: ${data.error}`);
-      }
-    } catch (error) {
-      addLog(
-        `❌ Error: ${error instanceof Error ? error.message : "Unknown error"}`
-      );
-      setResult({
-        success: false,
-        error: "Deployment failed",
-        details: error instanceof Error ? error.message : "Unknown error",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <>
@@ -89,13 +26,13 @@ export default function ContractCode({
             }}
             suppressContentEditableWarning={true}
           >
-            {sample}
+            {/* Sample contract code would go here */}
           </code>
         </pre>
       </div>
       <div className="flex gap-10 mt-2">
         {!editable && (
-          <Button className="" onClick={handleDeploy}>
+          <Button className="" onClick={() => console.log('Deploy clicked')}>
             Deploy
           </Button>
         )}

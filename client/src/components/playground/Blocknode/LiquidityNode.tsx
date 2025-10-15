@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 
 const currencies = ['ETH', 'USDT', 'BTC', 'DAI', 'LINK']
 
-const LiquidityNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
+const LiquidityNode: React.FC<NodeProps> = ({ isConnectable }) => {
     const [fromCurrency, setFromCurrency] = useState(currencies[0])
     const [toCurrency, setToCurrency] = useState('')
     const [error, setError] = useState('')

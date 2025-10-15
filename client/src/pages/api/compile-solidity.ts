@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { ContractFactory, ethers } from 'ethers';
 import { promises as fs } from 'fs';
 import path from 'path';
+// @ts-expect-error - solc doesn't have TypeScript definitions
 import solc from 'solc';
-import { createPublicClient, http, createWalletClient } from "viem";
+import { http, createWalletClient } from "viem";
 import { baseSepolia } from "viem/chains";
 import { privateKeyToAccount } from 'viem/accounts'
 import { type Abi } from 'viem';
@@ -11,7 +11,7 @@ import { type Abi } from 'viem';
 interface CompilationResult {
   success: boolean;
   bytecode?: string;
-  abi?: any;
+  abi?: unknown;
   error?: string;
   details?: string;
 }
@@ -52,8 +52,8 @@ async function compileSolidity(source: string, contractName: string): Promise<Co
     const output = JSON.parse(solc.compile(JSON.stringify(input)));
 
     // Check for compilation errors
-    if (output.errors?.some((error: any) => error.severity === 'error')) {
-      throw new Error('Compilation errors: ' + output.errors.map((e: any) => e.message).join('\n'));
+    if (output.errors?.some((error: { severity: string }) => error.severity === 'error')) {
+      throw new Error('Compilation errors: ' + output.errors.map((e: { message: string }) => e.message).join('\n'));
     }
 
     // Use the provided contract name instead of hardcoding "ContractDemo"
@@ -145,7 +145,7 @@ export default async function handler(
       return res.status(500).json(compilation);
     }
 
-    const deployment = await deployContract(compilation.abi, compilation.bytecode);
+    const deployment = await deployContract(compilation.abi as Abi, compilation.bytecode);
    
     console.log('Compilation successful!');
     console.log('Deployment successful!');

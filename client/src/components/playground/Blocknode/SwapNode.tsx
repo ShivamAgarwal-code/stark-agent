@@ -5,7 +5,7 @@ import { ArrowRightLeft } from 'lucide-react'
 
 const currencies = ['ETH', 'USDT', 'BTC', 'DAI', 'LINK']
 
-const SwapNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
+const SwapNode: React.FC<NodeProps> = ({ isConnectable }) => {
     const [fromCurrency, setFromCurrency] = useState(currencies[0])
     const [toCurrency, setToCurrency] = useState(currencies[1])
 

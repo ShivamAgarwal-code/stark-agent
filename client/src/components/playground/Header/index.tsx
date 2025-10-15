@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import Compile from '../Modal/Compile';
-import { toast } from 'sonner';
 
 export default function Header({ showClearButton, showFinishButton, handleClear, nodes, edges, flowSummary, selectedNode, handleDelete }) {
     const [isEditing, setIsEditing] = useState(false); // To track if we are editing
