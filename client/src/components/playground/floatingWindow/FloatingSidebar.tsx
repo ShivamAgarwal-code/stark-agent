@@ -7,7 +7,11 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod";
 import { toast } from 'sonner'
 
-export default function FloatingSidebar({ addBlock }) {
+interface FloatingSidebarProps {
+  addBlock: (block: { id: string; content: string; color: string; borderColor: string; hoverBorderColor: string; icon: any; code?: string }) => void;
+}
+
+export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
 
   const formSchema = z.object({
@@ -61,7 +65,7 @@ export default function FloatingSidebar({ addBlock }) {
     </div>
   );
 
-  function onSubmitCustomBlock(values) {
+  function onSubmitCustomBlock(values: { blockName: string; solidityCode: string }) {
     const newCustomBlock = {
       id: 'custom',
       content: values.blockName,
