@@ -8,7 +8,7 @@ interface HeaderProps {
   handleClear: () => void;
   nodes: unknown;
   edges: unknown;
-  flowSummary: unknown;
+  flowSummary: Array<{ content: string; id: string }>;
   selectedNode: string | null;
   handleDelete: (nodeId: string) => void;
 }

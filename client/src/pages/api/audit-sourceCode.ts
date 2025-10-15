@@ -41,7 +41,7 @@ export default async function handler(
         let fullResponse = '';
         for await (const messageStream of stream) {
             if (messageStream.type === 'content_block_delta') {
-                const deltaText = messageStream.delta.text;
+                const deltaText = 'text' in messageStream.delta ? messageStream.delta.text : '';
                 console.log(deltaText);
                 fullResponse += deltaText;
 

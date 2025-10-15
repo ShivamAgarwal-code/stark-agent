@@ -13,10 +13,10 @@ interface DeploymentResponse {
 interface ContractCodeProps {
   nodes: unknown;
   edges: unknown;
-  flowSummary: unknown;
+  flowSummary: Array<{ content: string; id: string }>;
   sourceCode: string;
   setSourceCode: (code: string) => void;
-  setDisplayState: (state: unknown) => void;
+  setDisplayState: (state: string) => void;
 }
 
 const ContractCode: React.FC<ContractCodeProps> = ({
