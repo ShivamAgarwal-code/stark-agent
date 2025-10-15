@@ -2,7 +2,18 @@ import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import Compile from '../Modal/Compile';
 
-export default function Header({ showClearButton, showFinishButton, handleClear, nodes, edges, flowSummary, selectedNode, handleDelete }) {
+interface HeaderProps {
+  showClearButton: boolean;
+  showFinishButton: boolean;
+  handleClear: () => void;
+  nodes: unknown;
+  edges: unknown;
+  flowSummary: unknown;
+  selectedNode: string | null;
+  handleDelete: (nodeId: string) => void;
+}
+
+export default function Header({ showClearButton, showFinishButton, handleClear, nodes, edges, flowSummary, selectedNode, handleDelete }: HeaderProps) {
     const [isEditing, setIsEditing] = useState(false); // To track if we are editing
     const [text, setText] = useState("DevXStark");
     const [isCompileModalOpen, setIsCompileModalOpen] = useState(false);

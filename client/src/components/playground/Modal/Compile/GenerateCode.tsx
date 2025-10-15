@@ -1,14 +1,22 @@
 import React, { useState } from 'react'
 import { Button } from '../../../ui/button';
 
-export default function GenerateCode({ nodes, edges, flowSummary, setDisplayState, setSourceCode }) {
+interface GenerateCodeProps {
+  nodes: unknown;
+  edges: unknown;
+  flowSummary: Array<{ content: string; id: string }>;
+  setDisplayState: (state: string) => void;
+  setSourceCode: (code: string) => void;
+}
+
+export default function GenerateCode({ nodes, edges, flowSummary, setDisplayState, setSourceCode }: GenerateCodeProps) {
     const [selectedOption, setSelectedOption] = useState("");
     return (
         <>
             <div className='w-17'>
                 <h2 className="text-2xl mb-3 text-black font-semibold">Confirm Flow Summary?</h2>
                 <div className="bg-[#d5bdaf] rounded-lg shadow-md p-4 border-2 border-[#2A2A2A]">
-                    {flowSummary.map((item, index) => (
+                    {flowSummary.map((item: { content: string; id: string }, index: number) => (
                         <div key={index} className="mb-2 flex items-center">
                             <span className="mr-2 text-red-600">{index + 1}.</span>
                             <span className="text-black">{item.content}</span>
@@ -53,6 +61,7 @@ export default function GenerateCode({ nodes, edges, flowSummary, setDisplayStat
             ); // Fetch data from the server
             const reader = response.body?.getReader();
             const decoder = new TextDecoder();
+            let accumulatedCode = "";
 
             if (reader) {
                 let done = false;
@@ -62,8 +71,9 @@ export default function GenerateCode({ nodes, edges, flowSummary, setDisplayStat
                     done = isDone;
 
                     if (value) {
-                        // Decode the chunk and append it to the state
-                        setSourceCode((prev) => prev + decoder.decode(value));
+                        // Decode the chunk and append it to the accumulated code
+                        accumulatedCode += decoder.decode(value);
+                        setSourceCode(accumulatedCode);
                     }
                 }
             }

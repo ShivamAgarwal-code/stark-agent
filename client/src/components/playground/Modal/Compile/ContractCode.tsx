@@ -100,6 +100,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
       setSourceCode("");
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
+      let accumulatedCode = "";
 
       if (reader) {
         let done = false;
@@ -107,7 +108,8 @@ const ContractCode: React.FC<ContractCodeProps> = ({
           const { value, done: isDone } = await reader.read();
           done = isDone;
           if (value) {
-            setSourceCode((prev: string) => prev + decoder.decode(value));
+            accumulatedCode += decoder.decode(value);
+            setSourceCode(accumulatedCode);
           }
         }
       }

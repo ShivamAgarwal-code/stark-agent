@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import CustomBlock from "../Modal/CustomBlock";
 import groupedBlocks from "./data";
 import { Code } from "lucide-react";
@@ -8,7 +8,7 @@ import { z } from "zod";
 import { toast } from 'sonner'
 
 interface FloatingSidebarProps {
-  addBlock: (block: { id: string; content: string; color: string; borderColor: string; hoverBorderColor: string; icon: any; code?: string }) => void;
+  addBlock: (block: { id: string; content: string; color: string; borderColor: string; hoverBorderColor: string; icon: React.ComponentType<{ size?: string | number }>; code?: string }) => void;
 }
 
 export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
@@ -16,14 +16,12 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
 
   const formSchema = z.object({
     blockName: z.string().min(1, "Block name is required"),
-    solidityCode: z.string().min(1, "Solidity code is required"),
   })
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       blockName: "",
-      solidityCode: "",
     },
   })
   return (
@@ -65,7 +63,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
     </div>
   );
 
-  function onSubmitCustomBlock(values: { blockName: string; solidityCode: string }) {
+  function onSubmitCustomBlock(values: { blockName: string }) {
     const newCustomBlock = {
       id: 'custom',
       content: values.blockName,
@@ -73,7 +71,6 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
       borderColor: 'border-[#6C6C6C]',
       hoverBorderColor: 'hover:border-[#9C9C9C]',
       icon: Code,
-      code: values.solidityCode,
     }
 
     addBlock(newCustomBlock)
