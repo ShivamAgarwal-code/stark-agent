@@ -15,7 +15,7 @@ interface HeaderProps {
 
 export default function Header({ showClearButton, showFinishButton, handleClear, nodes, edges, flowSummary, selectedNode, handleDelete }: HeaderProps) {
     const [isEditing, setIsEditing] = useState(false); // To track if we are editing
-    const [text, setText] = useState("DevXStark");
+    const [text, setText] = useState("Stark Agent");
     const [isCompileModalOpen, setIsCompileModalOpen] = useState(false);
     const showDeleteButton = !!selectedNode;
 
