@@ -26,6 +26,7 @@
     "@starknet-react/core": "^3.6.2",
     "@xyflow/react": "^12.3.5",
     "axios": "^1.7.9",
+    "chalk": "^5.6.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^16.4.7",
@@ -47,9 +48,11 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.1",
+    "viem": "^2.38.2",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/chalk": "^0.4.31",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
