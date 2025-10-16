@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { promises as fs } from 'fs';
 import path from 'path';
-// @ts-expect-error - solc doesn't have TypeScript definitions
 import solc from 'solc';
 import { http, createWalletClient } from "viem";
 import { baseSepolia } from "viem/chains";
